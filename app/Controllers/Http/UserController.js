@@ -1,0 +1,230 @@
+'use strict'
+const User = use('App/Models/User')
+const { validateAll, rule } = use('Validator');
+const Hash = use('Hash');
+const { InvalidArgumentException } = require('@adonisjs/generic-exceptions')
+/** @typedef {import('@adonisjs/framework/src/Request')} Request */
+/** @typedef {import('@adonisjs/framework/src/Response')} Response */
+/** @typedef {import('@adonisjs/framework/src/View')} View */
+
+/**
+ * Resourceful controller for interacting with users
+ */
+class UserController {
+  /**
+   * Show a list of all users.
+   * GET users
+   *
+   * @param {object} ctx
+   * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   * @param {View} ctx.view
+   */
+  async index({ request, response, view }) {
+  }
+
+  /**
+   * Render a form to be used for creating a new user.
+   * GET users/create
+   *
+   * @param {object} ctx
+   * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   * @param {View} ctx.view
+   */
+  async create({ request, response }) {
+
+    try {
+      const rules = {
+        first_name: [
+          rule('required'),
+          rule('min', '3'),
+          rule('max', '50'),
+          rule('regex', /^([a-z]+\s)*[a-z]+$/i)
+        ],
+        last_name: [
+          rule('required'),
+          rule('min', '6'),
+          rule('max', '60'),
+          rule('regex', /^([a-z]+\s)*[a-z]+$/i)
+        ],
+        email: 'required|email|max:100|unique:users',
+        password: 'required|min:8|confirmed',
+        username: 'required|max:20|unique:users',
+        direccion: 'required|max:255',
+        telefono: 'required|max:9|unique:users'
+      }
+
+      const validation = await validateAll(request.all(), rules, {
+        'first_name.required': 'Por favor ingrese su Nombre',
+        'first_name.min': 'El nombre debe ser mayor a 3 caracteres',
+        'first_name.max': 'El nombre debe ser menor a 50 caracteres',
+        'first_name.regex': 'Ingrese correctamente su nombre',
+        'last_name.required': 'Por favor ingrese su Apellido',
+        'last_name.min': 'El nombre debe ser mayor a 6 caracteres',
+        'last_name.max': 'El nombre debe ser menor a 60 caracteres',
+        'last_name.regex': 'Ingrese correctamente sus apellidos',
+        'email.required': 'Por favor ingrese su Email',
+        'email.email': 'Por favor ingrese un Email válido',
+        'email.unique': 'Este Email ya existe',
+        'password.confirmed': 'Error al confirmar la contraseña',
+        'password.required': 'Por favor ingrese la contraseña',
+        'username.required': 'Por favor ingrese su Usuario',
+        'username.unique': 'Este Usuario ya existe',
+        'direccion.required': 'Por favor ingrese su direccion',
+        'telefono.required': 'Por favor ingrese su Telefono',
+        'telefono.max': 'El telefono debe ser maximo de 9 Dígitos',
+        'telefono.unique': 'Este Telefono ya existe'
+      })
+
+      try {
+        if (validation.fails()) {
+          let tmp_errors = {};
+          await validation.messages().filter(obj => {
+            tmp_errors[obj.field] = obj.message;
+          });
+          throw new InvalidArgumentException(tmp_errors)
+        }
+        const data = validation._data
+        let obj = ""
+        try {
+          obj = await User.create({
+            username: data.username,
+            email: data.email,
+            password: data.password,
+            first_name: data.first_name,
+            last_name: data.last_name,
+            telefono: data.telefono,
+            direccion: data.direccion
+          })
+          
+          return {
+            success: true,
+            code: 201,
+            message: 'El Usuario fue registrado correctamente',
+            obj
+          }
+        } catch (error) {
+
+          return {
+            success: false,
+            code: 501,
+            message: JSON.stringify(error.message)
+          }
+        }
+
+      } catch (error) {
+        return {
+          success: false,
+          code: error.code,
+          message: JSON.stringify(error.message)
+        }
+      }
+
+    } catch (error) {
+      console.log(error)
+    }
+
+  }
+
+  async login({ request, auth }) {
+    const validation = await validateAll(request.all(), {
+      username: 'required',
+      password: 'required'
+    }, {
+      'username.required': 'El Usuario el olbgligatorio',
+      'password.required': 'El Usuario el olbgligatorio'
+    })
+    try {
+      if (validation.fails()) throw new InvalidArgumentException(validation.messages())
+      try {
+        let data = validation._data
+        // return  data;
+        let user = await User.query()
+          .where('username', request.input('username'))
+          .orWhere('email', request.input('username'))
+          .first();
+        if (!user) throw new Error("La cuenta de usuario no existe!");
+        // validar password
+        let isSame = await Hash.verify(request.input('password'), user.password)
+        if (isSame) throw new Error("Las contraseña es incorrecta");
+        const token = await auth.generate(user);
+        return {
+          success: true,
+          code: 201,
+          message: token
+        }
+      } catch (error) {
+        return {
+          succes: false,
+          code: error.code,
+          message: error.message
+        }
+      }
+    } catch (error) {
+      return {
+        succes: false,
+        code: error.code,
+        message: error.message
+      }
+    }
+  }
+  /**
+   * Create/save a new user.
+   * POST users
+   *
+   * @param {object} ctx
+   * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   */
+  async store({ request, response }) {
+  }
+
+  /**
+   * Display a single user.
+   * GET users/:id
+   *
+   * @param {object} ctx
+   * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   * @param {View} ctx.view
+   */
+  async show({ params, request, response, view }) {
+  }
+
+  /**
+   * Render a form to update an existing user.
+   * GET users/:id/edit
+   *
+   * @param {object} ctx
+   * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   * @param {View} ctx.view
+   */
+  async edit({ params, request, response, view }) {
+  }
+
+  /**
+   * Update user details.
+   * PUT or PATCH users/:id
+   *
+   * @param {object} ctx
+   * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   */
+  async update({ params, request, response }) {
+  }
+
+  /**
+   * Delete a user with id.
+   * DELETE users/:id
+   *
+   * @param {object} ctx
+   * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   */
+  async destroy({ params, request, response }) {
+  }
+}
+
+module.exports = UserController

@@ -20,5 +20,10 @@ Route.get('/', () => {
     return { mensage: 'retornando view' }
 })
 Route.post('api/register', 'UserController.create')
-Route.post('api/login','UserController.login')
-    
+Route.post('api/login', 'UserController.login')
+
+Route.get('api/ubigeo/departamento', 'BadgeController.getDepartamento')
+Route.get('api/ubigeo/provincia/:id', 'BadgeController.getProvincia')
+Route.get('api/ubigeo/distrito/:id/:ida', 'BadgeController.getDistrito')
+
+

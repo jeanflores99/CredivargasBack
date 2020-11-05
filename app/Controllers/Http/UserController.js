@@ -1,7 +1,9 @@
 'use strict'
+const moment = use('moment')
 const User = use('App/Models/User')
 const { validateAll, rule } = use('Validator');
 const Hash = use('Hash');
+
 const { InvalidArgumentException } = require('@adonisjs/generic-exceptions')
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
@@ -78,6 +80,7 @@ class UserController {
       })
 
       try {
+
         if (validation.fails()) {
           let tmp_errors = {};
           await validation.messages().filter(obj => {
@@ -95,9 +98,16 @@ class UserController {
             first_name: data.first_name,
             last_name: data.last_name,
             telefono: data.telefono,
-            direccion: data.direccion
+            direccion: data.direccion,
+            fechanacimiento: moment(data.fechanacimiento).format('YYYY-MM-DD'),
+            cod_dep: data.cod_dep,
+            cod_pro: data.cod_pro,
+            cod_dis: data.cod_dis
+
           })
-          
+
+
+
           return {
             success: true,
             code: 201,
@@ -132,11 +142,23 @@ class UserController {
       username: 'required',
       password: 'required'
     }, {
-      'username.required': 'El Usuario el olbgligatorio',
-      'password.required': 'El Usuario el olbgligatorio'
+      'username.required': 'El Usuario o Email el olbgligatorio',
+      'password.required': 'La Contraseña el olbgligatorio'
     })
     try {
-      if (validation.fails()) throw new InvalidArgumentException(validation.messages())
+
+      // console.log(validation.messages())
+      if (validation.fails()) {
+        let tmp_errors = {};
+        await validation.messages().filter(obj => {
+          tmp_errors[obj.field] = obj.message;
+        });
+        throw new InvalidArgumentException(tmp_errors)
+      }
+      // if (validation.fails()) throw new InvalidArgumentException(validation.messages())
+
+
+
       try {
         let data = validation._data
         // return  data;
@@ -144,10 +166,10 @@ class UserController {
           .where('username', request.input('username'))
           .orWhere('email', request.input('username'))
           .first();
-        if (!user) throw new Error("La cuenta de usuario no existe!");
+        if (!user) throw new InvalidArgumentException({ username: "La cuenta de usuario no existe!" });
         // validar password
         let isSame = await Hash.verify(request.input('password'), user.password)
-        if (isSame) throw new Error("Las contraseña es incorrecta");
+        if (!isSame) throw new InvalidArgumentException({ password: "Las contraseña es incorrecta" });
         const token = await auth.generate(user);
         return {
           success: true,

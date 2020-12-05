@@ -20,6 +20,7 @@
     "@adonisjs/auth": "^3.0.7",
     "@adonisjs/bodyparser": "^2.0.5",
     "@adonisjs/cors": "^1.0.7",
+    "@adonisjs/drive": "^1.0.4",
     "@adonisjs/fold": "^4.0.9",
     "@adonisjs/framework": "^5.0.9",
     "@adonisjs/ignitor": "^2.0.8",
@@ -27,7 +28,9 @@
     "@adonisjs/validator": "^5.0.6",
     "moment": "^2.29.1",
     "mysql": "^2.18.1",
-    "validator": "^13.1.17"
+    "uid": "^2.0.0",
+    "validator": "^13.1.17",
+    "validator-error-adonis": "^1.1.5"
   },
   "devDependencies": {},
   "autoload": {

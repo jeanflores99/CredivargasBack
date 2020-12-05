@@ -19,11 +19,34 @@ const Route = use('Route')
 Route.get('/', () => {
     return { mensage: 'retornando view' }
 })
+// Route.group(() => {
 Route.post('api/register', 'UserController.create')
 Route.post('api/login', 'UserController.login')
+// }).middleware(['guest'])
+
+
+
+
+
+Route.get('api/logout', 'UserController.logout')
+
+
+Route.get('/getUser', 'UserController.show')
 
 Route.get('api/ubigeo/departamento', 'BadgeController.getDepartamento')
 Route.get('api/ubigeo/provincia/:id', 'BadgeController.getProvincia')
 Route.get('api/ubigeo/distrito/:id/:ida', 'BadgeController.getDistrito')
+
+Route.get('api/getTipoEquipo', 'TipoequipoController.getTipoEquipo')
+Route.get('api/getMarca', 'TipoequipoController.getMarca')
+Route.get('api/getAllProducto', 'EquipoController.getAllProducto')
+Route.get('api/getAllProductoCliente', 'EquipoController.getAllProductoCliente')
+
+
+Route.post('api/admin/register', 'EquipoController.create')
+
+Route.get('file', 'FileController.handle');
+Route.get('api/obtenerproducto/:id', 'EquipoController.obtenerproducto')
+
 
 

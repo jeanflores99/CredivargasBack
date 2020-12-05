@@ -24,7 +24,14 @@ class UserController {
    */
   async index({ request, response, view }) {
   }
+  async logout({ auth, session, response }) {
+    try {
 
+      // session.flash({ successMessage: 'todo bien mano' })
+    } catch (error) {
+      console.log(error)
+    }
+  }
   /**
    * Render a form to be used for creating a new user.
    * GET users/create
@@ -38,6 +45,7 @@ class UserController {
 
     try {
       const rules = {
+        dni: 'required|min:8|unique:users',
         first_name: [
           rule('required'),
           rule('min', '3'),
@@ -58,6 +66,9 @@ class UserController {
       }
 
       const validation = await validateAll(request.all(), rules, {
+        'dni.required': 'Por favor ingrese su DNI',
+        'dni.min': 'El DNI debe ser de 8 dígitos',
+        'dni.unique': 'Este DNI ya esta siendo usado',
         'first_name.required': 'Por favor ingrese su Nombre',
         'first_name.min': 'El nombre debe ser mayor a 3 caracteres',
         'first_name.max': 'El nombre debe ser menor a 50 caracteres',
@@ -92,6 +103,7 @@ class UserController {
         let obj = ""
         try {
           obj = await User.create({
+            dni: data.dni,
             username: data.username,
             email: data.email,
             password: data.password,
@@ -161,7 +173,7 @@ class UserController {
 
       try {
         let data = validation._data
-        // return  data;
+
         let user = await User.query()
           .where('username', request.input('username'))
           .orWhere('email', request.input('username'))
@@ -170,8 +182,11 @@ class UserController {
         // validar password
         let isSame = await Hash.verify(request.input('password'), user.password)
         if (!isSame) throw new InvalidArgumentException({ password: "Las contraseña es incorrecta" });
-        const token = await auth.generate(user);
+        const token = await auth.generate(user)
+        // const token = await auth.login(user)
+
         return {
+          user,
           success: true,
           code: 201,
           message: token
@@ -211,8 +226,22 @@ class UserController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show({ params, request, response, view }) {
+  async show({ auth }) {
+    try {
+      return await auth.getUser()
+    } catch (error) {
+      return {
+        message: 'El token ya no es valido',
+        error
+      }
+      // if (auth.user.id !== Number(params.id)) {
+      //   return "You cannot see someone else's profile"
+      // }
+      // return auth.user
+    }
   }
+
+
 
   /**
    * Render a form to update an existing user.
@@ -248,5 +277,6 @@ class UserController {
   async destroy({ params, request, response }) {
   }
 }
+
 
 module.exports = UserController

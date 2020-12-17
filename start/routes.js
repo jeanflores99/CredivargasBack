@@ -48,5 +48,16 @@ Route.post('api/admin/register', 'EquipoController.create')
 Route.get('file', 'FileController.handle');
 Route.get('api/obtenerproducto/:id', 'EquipoController.obtenerproducto')
 
+Route.post('api/carrito/crear', 'CarrocompraController.create')
+Route.get('api/carrito/show/:id', 'CarrocompraController.show')
+Route.post('api/carrito/llenarproducto/:id', 'ItemcarroController.llenarProductos')
+Route.post('api/carrito/agregaralcarrito/:idproducto', 'ItemcarroController.agregaralcarrito')
+Route.post('api/carrito/editar/:idproducto', 'ItemcarroController.edit')
+Route.get('api/carrito/obtenerdatosdelcarrito/:userid', 'CarrocompraController.pagarcarrito')
+Route.post('api/carrito/finalizarcompra/:userid', 'CarrocompraController.finalizarcompra')
+Route.post('api/carrito/vercompras', 'CarrocompraController.vercompras')
+Route.get('api/carrito/vercompradetallado/:idcarrito', 'ItemcarroController.vercompradetallado')
+
+
 
 

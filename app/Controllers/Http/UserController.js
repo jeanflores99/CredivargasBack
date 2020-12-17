@@ -3,6 +3,7 @@ const moment = use('moment')
 const User = use('App/Models/User')
 const { validateAll, rule } = use('Validator');
 const Hash = use('Hash');
+const db = use('Database')
 
 const { InvalidArgumentException } = require('@adonisjs/generic-exceptions')
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
@@ -227,17 +228,27 @@ class UserController {
    * @param {View} ctx.view
    */
   async show({ auth }) {
+
+
+    let dat = await auth.getUser()
+
+    let dato = await db.raw(`SELECT u.id,u.username,u.dni,u.email,u.first_name,u.last_name,u.telefono,u.direccion,u.fechanacimiento,u.cod_dep,b.departamento,u.cod_pro,b.provincia,u.cod_dis,b.distrito,u.isadmin FROM users as u
+    INNER JOIN badges as b
+    on b.cod_dep = u.cod_dep
+    and b.cod_pro = u.cod_pro
+    and b.cod_dis= u.cod_dis
+    WHERE u.id = `+ dat.id)
+    let aea = await dato[0]
+    dat = await aea[0]
+
     try {
-      return await auth.getUser()
+      return dat
     } catch (error) {
       return {
         message: 'El token ya no es valido',
         error
       }
-      // if (auth.user.id !== Number(params.id)) {
-      //   return "You cannot see someone else's profile"
-      // }
-      // return auth.user
+
     }
   }
 

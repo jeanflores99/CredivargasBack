@@ -8,9 +8,9 @@ class CarrocompraSchema extends Schema {
     this.create('carrocompras', (table) => {
       table.increments()
       table.decimal('total', 8, 2)
-      table.date('fecha')
-      table.time('hora')
+      table.boolean('atendido').defaultTo('false')
       table.integer('user_id').unsigned().references('id').inTable('users')
+      table.integer('card_id').unsigned().references('id').inTable('cards')
       table.timestamps()
     })
   }

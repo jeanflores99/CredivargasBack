@@ -1,5 +1,6 @@
 'use strict'
 const ItemCarro = use('App/Models/Itemcarro')
+const db = use('Database')
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
@@ -20,8 +21,15 @@ class ItemcarroController {
   async vercompradetallado({ params }) {
     let { idcarrito } = params
 
+    let tmp = await db.raw(`SELECT i.id,i.precio,i.cantidad,i.subtotal,e.name,e.description FROM itemcarros as i
+    INNER JOIN equipos as e
+    on i.id_equipo = e.id
+    where i.id_carrito=${idcarrito}`)
+    tmp = tmp[0]
+    return {
+      dato: tmp
+    }
 
-    console.log(idcarrito)
   }
 
   /**

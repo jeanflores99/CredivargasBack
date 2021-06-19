@@ -139,10 +139,12 @@ class ItemcarroController {
       case 'add':
         if (cantidad < 5) {
           cantidad++;
-          subtotal = cantidad * precio
+
+
+          // subtotal = await ()
           productoEquipo.cantidad = cantidad
           productoEquipo.precio = precio
-          productoEquipo.subtotal = subtotal
+          productoEquipo.subtotal = await (cantidad * precio)
           await productoEquipo.save()
           return {
 
@@ -159,10 +161,10 @@ class ItemcarroController {
       case 'minus':
         if (cantidad > 1) {
           cantidad--;
-          subtotal = cantidad * precio
+          // subtotal = cantidad * precio
           productoEquipo.cantidad = cantidad
           productoEquipo.precio = precio
-          productoEquipo.subtotal = subtotal
+          productoEquipo.subtotal = await (cantidad * precio)
           await productoEquipo.save()
           return {
 

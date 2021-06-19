@@ -44,7 +44,7 @@ class EquipoController {
       return productos.length ?
         {
           success: true,
-          dato:productos[0],
+          dato: productos[0],
           message: 'El Equipo fue encontrado'
         } :
         {
@@ -181,15 +181,6 @@ class EquipoController {
         const data = validation._data
         let obj = ""
         try {
-          // console.log(request.all())
-          // console.log('hola')
-
-          // console.log( parseFloat(data.precio))
-
-          // const file = request.file('files')
-          // // const name_ur = await data.name + uid() + '.' + file.subtype
-          // let img = file._files || file
-
           let file = await Storage.saveFile(request, 'files', {
             size: '6mb',
             extnames: ['jpeg', 'png', 'jpg', 'JPG'],

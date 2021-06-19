@@ -186,8 +186,18 @@ class UserController {
         const token = await auth.generate(user)
         // const token = await auth.login(user)
 
+        let dat = await db.raw(`SELECT u.id,u.username,u.dni,u.email,u.first_name,u.last_name,u.telefono,u.direccion,u.fechanacimiento,u.cod_dep,b.departamento,u.cod_pro,b.provincia,u.cod_dis,b.distrito,u.isadmin FROM users as u
+        INNER JOIN badges as b
+        on b.cod_dep = u.cod_dep
+        and b.cod_pro = u.cod_pro
+        and b.cod_dis= u.cod_dis
+        WHERE u.id = `+ user.id)
+        user = await dat[0]
+
+
+
         return {
-          user,
+          user: user[0],
           success: true,
           code: 201,
           message: token
@@ -240,7 +250,7 @@ class UserController {
     WHERE u.id = `+ dat.id)
     let aea = await dato[0]
     dat = await aea[0]
-
+    console.log(dat)
     try {
       return dat
     } catch (error) {
